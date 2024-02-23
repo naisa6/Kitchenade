@@ -1,8 +1,86 @@
 "
     The project shall be divided into four stages:
-        - wireframe and database design
+        - wireframe and database design X
         - implementation and build of backend and frontend (without authentication)
         - creation of authentication flow and implementation, adjustments and refactoring applied to application
         - deployment
+
+    
+    
+    Recipe page:
+        - Button to load recipes
+        - Table or card view available
+            - Dish name, time required, image, cuisine
+        - Button to add recipe
+        - Filter options: cuisine, time requirements, course, inventory availability
+
+    Order of layout on a single recipe page:
+        - Image gallery carousel (horizontal, like hero image)
+        - Time required, servings, cuisine, course
+        - Ingredients, with button to add items missing from inventory to grocery list
+        - Instructions
+        - Video
+        - Additional info - notes, nutrition, source
+
+    Recipe information:
+        Images, Videos
+        Cook Time, Prep Time
+        Servings
+        Cuisine
+        Course
+        Ingredients - Req
+        Method/ instructions - Req
+        Notes
+        Nutrition
+        Source (website/ book)
+
+        User information regarding recipe:
+            - frequency recipe chosen
+            - add to favourites
+            -  
+            
+    Data Schema:
+        Collections:
+            - user
+                - ID
+                - email (string)
+                - inventorySection (array)
+                - shoppingListCategory (array)
+            - recipe
+                - ID
+                - dishName (string) -req
+                - image (BinData)
+                - video embedding (YouTube)
+                - source (string)
+                - prep time (Number in minutes)
+                - cooking time (Number in minutes)
+                - cuisine (string)
+                - course (string)
+                - servings (Number)
+                - ingredients (array) -req
+                - instructions (string) -req
+                - Notes (string)
+            - ingredient
+                - ID
+                - item (string) -req
+                - quantity (string) -req
+            - inventory
+                - ID
+                - section (string)
+                - item (string)
+                - quantity (string)
+                - availability (Number) #this is an optional indicator of how much something is left
+                - expirationDate (Date)
+                - purchaseDate (Date)
+            - grocery
+                - ID
+                - category -req
+                - item (string) -req
+                - quantity (string) -req
+                - inCart (boolean) -req
+
+
+        
+        
 
 "

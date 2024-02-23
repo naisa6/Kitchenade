@@ -1,0 +1,26 @@
+"
+Goal: to create a web application that can be used to view recipes, inventory lists and grocery lists stored in the database,
+to make meal preparations easier. 
+
+Requirements: 
+    - recipes - recipes will be stored in the database and the user will be able to add more recipes. Machine learning models to 
+    automate recipe parsing and storage to database will be explored as an option. The process will be similar to webscraping methods
+    and reading through the HTML document. Recipes can be displayed in card view or table view
+    - inventory - the user can update their current inventory, which will include name of item, quantity and expiration date.
+        The user will be able to add custom categorical sections for items and move them around in the interface.There will be a dropdown list next to the input box to select a section to add to.
+    - grocery list - the grocery list will be a section where the user can see what items they need when shopping, and the user 
+        can indicate items that have been added to the cart. The user will be able to add custom categorical sections for items
+        and move them around in the interface. There will be a dropdown list next to the input box to select a section to add to.
+    - when viewing a recipe, the application will indicate which recipes the user will be able to make with their current inventory
+    - the recipe page will have a button to add items that they are missing from the recipe, which they do not have in their 
+        inventory to the grocery list. 
+    - a search bar will be provided to search for recipes; pressing enter or clicking on a suggestion will take the user to the page for that recipe
+    - create an authentication system for the user so they are able to create a user profile, to allow for personalisation
+    - the personalisation is used for recommendation algorithms such as cuisine or flavour profiles
+    
+    Future developments:
+    - automate a system which takes data from supermarkets using Google's Shopping feature to 
+        gather data on prices and create an optimised order which the user will be able to review and place
+    - ratings and comments/reviews from users
+    - a home page to show recommended recipes
+    "

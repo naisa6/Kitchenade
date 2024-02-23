@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import NavBar from "../components/NavBar.jsx";
 import InventorySideBar from "../components/InventorySideBar.jsx";
 import axios from "axios";
+import Box from "@mui/material/Box";
+
 const Inventory = () => {
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState([]);

@@ -17,6 +17,7 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
+import TextField from "@mui/material/TextField";
 
 import { useNavigate } from "react-router-dom";
 
@@ -37,8 +38,6 @@ const InventorySideBar = () => {
   const label = { inputProps: { "aria-label": "Filter Checkbox" } };
 
   useEffect(() => {
-    setCourse(courseOptions);
-    setCuisine(cuisineOptions);
     setLoading(false);
   }, []);
 
@@ -46,7 +45,6 @@ const InventorySideBar = () => {
 
   useEffect(() => {
     if (!initialRender.current) {
-      onSidebarData(optionsDict);
     } else {
       initialRender.current = false;
     }
@@ -90,11 +88,14 @@ const InventorySideBar = () => {
           <Drawer
             sx={{
               width: drawerWidth,
+              height: "100000",
+
               flexShrink: 0,
               "& .MuiDrawer-paper": {
                 width: drawerWidth,
-                boxSizing: "border-box",
-                // marginTop: "68.5px",
+                height: "100000",
+
+                marginTop: "2%",
                 zIndex: 1,
               },
             }}
@@ -105,10 +106,57 @@ const InventorySideBar = () => {
               <Typography
                 variant="h5"
                 component="div"
-                sx={{ mx: 2, my: 2, display: "flex", justifyContent: "center" }}
+                sx={{
+                  mx: 2,
+                  my: 2,
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "50px",
+                  marginBottom: "100px",
+                }}
               >
-                Recipes
+                My Inventory
               </Typography>
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{
+                  mx: 2,
+                  display: "flex",
+                  justifyContent: "left",
+                  fontSize: "16px",
+                  marginBottom: "20px",
+                }}
+              >
+                Add Item
+              </Typography>
+
+              <TextField
+                id={`standard-search`}
+                label="Item Name"
+                type="search"
+                sx={{
+                  marginTop: "5px",
+                  marginBottom: "5px",
+                  textAlign: "center",
+                  width: "80%",
+                  marginLeft: "10%",
+                }}
+                onChange={console.log("")}
+              />
+              <TextField
+                id={`standard-search`}
+                label="Quantity"
+                type="search"
+                sx={{
+                  marginTop: "5px",
+                  marginBottom: "5px",
+                  textAlign: "center",
+                  width: "80%",
+                  marginLeft: "10%",
+                }}
+                onChange={console.log("")}
+              />
               <Box textAlign="center">
                 <Button
                   variant="contained"
@@ -128,210 +176,8 @@ const InventorySideBar = () => {
                   Add
                 </Button>
               </Box>
-              <Typography
-                variant="h7"
-                component="div"
-                sx={{
-                  mx: 2,
-                  my: 2,
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                Sort
-              </Typography>
-
-              <FormControl
-                sx={{
-                  marginTop: "-5%",
-                  marginLeft: "15%",
-                  marginBottom: "5%",
-                }}
-              >
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  defaultValue="Recently Added"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="Recently Added"
-                    control={<Radio />}
-                    label={
-                      <span style={{ fontSize: "14px" }}>Recently Added</span>
-                    }
-                    onClick={() => handleButtonClick("Sort", "Recently Added")}
-                  />
-                  <FormControlLabel
-                    value="Time Required"
-                    control={<Radio />}
-                    label={
-                      <span style={{ fontSize: "14px" }}>
-                        {"Time Required"}
-                      </span>
-                    }
-                    onClick={() => handleButtonClick("Sort", "Time Required")}
-                  />
-                </RadioGroup>
-              </FormControl>
-              <Divider />
-              <Typography
-                variant="h7"
-                component="div"
-                sx={{
-                  mx: 2,
-                  my: 2,
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                Filters
-              </Typography>
-              {["Cuisine", "Course"].map((filterOption, index) => {
-                let optionList = [];
-                switch (filterOption) {
-                  case "Cuisine":
-                    optionList = cuisine;
-                    break;
-                  case "Course":
-                    optionList = course;
-
-                    break;
-                }
-
-                return (
-                  <div key={index}>
-                    <Divider />
-                    <Typography
-                      variant="body2"
-                      component="div"
-                      sx={{
-                        mx: 2,
-                        display: "flex",
-                        justifyContent: "left",
-                        fontSize: "16px",
-                      }}
-                    >
-                      {filterOption}
-                    </Typography>
-
-                    <List>
-                      {optionList.map((text, index) => (
-                        <ListItem key={text} sx={{ maxHeight: "36px" }}>
-                          <ListItemButton
-                            onClick={() =>
-                              handleButtonClick(filterOption, text)
-                            }
-                            sx={{ maxHeight: "36px" }}
-                          >
-                            <Checkbox checked={checkedItems.includes(text)} />
-                            <ListItemText
-                              primary={text}
-                              primaryTypographyProps={{ fontSize: "14px" }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                    <Divider />
-                  </div>
-                );
-              })}
-              <Typography
-                variant="body2"
-                component="div"
-                sx={{
-                  mx: 2,
-                  display: "flex",
-                  justifyContent: "left",
-                  fontSize: "16px",
-                }}
-              >
-                Time Required
-              </Typography>
-
-              <FormControl
-                sx={{
-                  marginTop: "5%",
-                  marginLeft: "15%",
-                  marginBottom: "5%",
-                }}
-              >
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  defaultValue="Any"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="< 30 min"
-                    control={<Radio />}
-                    label={
-                      <span style={{ fontSize: "14px" }}>{"< 30 min"}</span>
-                    }
-                    onClick={() =>
-                      handleButtonClick("Time Required", "< 30 min")
-                    }
-                  />
-                  <FormControlLabel
-                    value="30 min ~ 1 hr"
-                    control={<Radio />}
-                    label={
-                      <span style={{ fontSize: "14px" }}>30 min ~ 1 hr</span>
-                    }
-                    onClick={() =>
-                      handleButtonClick("Time Required", "30 min ~ 1 hr")
-                    }
-                  />
-                  <FormControlLabel
-                    value="1 hr+"
-                    control={<Radio />}
-                    label={<span style={{ fontSize: "14px" }}>1 hr+</span>}
-                    onClick={() => handleButtonClick("Time Required", "1 hr+")}
-                  />
-                  <FormControlLabel
-                    value="Any"
-                    control={<Radio />}
-                    label={<span style={{ fontSize: "14px" }}>Any</span>}
-                    onClick={() => handleButtonClick("Time Required", "Any")}
-                  />
-                </RadioGroup>
-              </FormControl>
-              <Divider />
-              <Typography
-                variant="body2"
-                component="div"
-                sx={{
-                  mx: 2,
-                  display: "flex",
-                  justifyContent: "left",
-                  fontSize: "16px",
-                }}
-              >
-                Availability
-              </Typography>
-
-              <List>
-                <ListItem key={"Available"} sx={{ maxHeight: "36px" }}>
-                  <ListItemButton
-                    onClick={() =>
-                      handleButtonClick("Availability", "Available")
-                    }
-                    sx={{ maxHeight: "36px" }}
-                  >
-                    <Checkbox checked={checkedItems.includes("Available")} />
-                    <ListItemText
-                      primary={"Available"}
-                      primaryTypographyProps={{ fontSize: "14px" }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-              <Divider />
             </Box>
           </Drawer>
-          <Box
-            component="main"
-            sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
-          ></Box>
         </Box>
       )}
     </>
