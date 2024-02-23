@@ -1,0 +1,8 @@
+"
+    The project shall be divided into four stages:
+        - wireframe and database design
+        - implementation and build of backend and frontend (without authentication)
+        - creation of authentication flow and implementation, adjustments and refactoring applied to application
+        - deployment
+
+"
