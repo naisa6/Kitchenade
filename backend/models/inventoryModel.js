@@ -10,15 +10,21 @@ const inventorySchema = mongoose.Schema(
             required: true,
         },
         item: {
-            type: Array,
-            required: true,            
-        },
-        quantity: {
             type: String,
             required: true,            
         },
+        amount: {
+            type: Number,
+              
+        },
+        unit: {
+            type: String,            
+        },
+        quantity: {
+            type: Number,
+        },
         availability: {
-            type: Number,            
+            type: Number
         },
         purchaseDate: {
             type: Date,

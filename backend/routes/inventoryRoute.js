@@ -6,10 +6,11 @@ const router = express.Router();
 router.get('/', async (req, res) => {                       //get all inventory items
     try {
         const inventory = await Inventory.find({user: req.body.user});
+        console.log("BACKEND", inventory)
         return res.status(200).json({count: inventory.length,
                                         data: inventory});
     } catch (error) {
-        console.log(error.message);
+        console.log( error.message);
         res.status(500).send({ message: error.message })
     }
 })
@@ -25,6 +26,19 @@ router.get('/', async (req, res) => {                       //get all inventory 
 //         res.status(500).send({ message: error.message })
 //     }
 // })
+
+router.get('/getUserInventory/:id/:section', async (req, res) => {
+    try {
+        const { id } = req.params
+        const { section } = req.params
+        const userItems = await Inventory.find({user: id, section: section}).sort({ expiryDate: 1 }).exec();        
+ 
+        return res.status(200).json(userItems);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({message: error.message})
+    }
+})
 
 router.get('/:item', async (req, res) => {                    //get item by name
     try {
@@ -57,9 +71,10 @@ router.post('/addItem', async (req, res) => {             //add a new recipe
             user: req.body.user,
             section: req.body.section,
             item: req.body.item,
+            amount: req.body.amount,
+            unit: req.body.unit,
             quantity: req.body.quantity,
-            availability: req.body.availability,
-            cookTime: req.body.cookTime,
+            availability: req.body.availability, 
             purchaseDate: req.body.purchaseDate,
             expiryDate: req.body.expiryDate,
         };
@@ -82,7 +97,7 @@ router.put('/:id', async (req, res) => {                    //update inventory b
         const result = await Inventory.findByIdAndUpdate(id, req.body);
 
         if (!result) {
-            return res.status(404).json({message: 'Inventory not found'});
+            return res.status(404).json({message: 'Item not found'});
         }
 
         return res.status(200).send({ message: 'Inventory updated successfully'});
@@ -100,10 +115,10 @@ router.delete('/:id', async (req, res) => {                 //delete inventory b
         const result = await Inventory.findByIdAndDelete(id);
 
         if (!result) {
-            return res.status(404).json({ message: 'Inventory not found' });
+            return res.status(404).json({ message: 'Item not found' });
         }
 
-        return res.status(200).send( { message: 'Inventory deleted successfully' });
+        return res.status(200).send( { message: 'Item deleted successfully' });
 
     } catch (error) {
         console.log(error.message);

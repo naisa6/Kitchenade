@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema(
     {
+        userId: {
+            type: String,
+            required: true,
+        },
         email: {
             type: String,
             required: true,
@@ -10,6 +14,9 @@ const userSchema = mongoose.Schema(
             type: Array,            
         },
         shoppingListCategory: {
+            type: Array,            
+        },
+        favourites: {
             type: Array,            
         },
     },

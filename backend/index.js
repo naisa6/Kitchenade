@@ -7,6 +7,9 @@ import { Inventory } from './models/inventoryModel.js';
 import { Recipe } from './models/recipeModel.js';
 import { User } from './models/userModel.js';
 import recipesRouter from './routes/recipesRoute.js';
+import usersRouter from './routes/userRoute.js'
+import inventoryRouter from './routes/inventoryRoute.js'
+import groceriesRouter from './routes/groceriesRoute.js'
 import cors from 'cors';
 import path from 'path'
 
@@ -24,7 +27,10 @@ app.get('/', (req, res) => {
     return res.status(234).send("The backend is running.");
 })
 
+app.use('/users', usersRouter);
 app.use('/recipes', recipesRouter);
+app.use('/inventory', inventoryRouter)
+app.use('/grocery', groceriesRouter)
 
 mongoose.connect(mongoDBURL)
         .then(() => {

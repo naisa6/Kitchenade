@@ -14,6 +14,7 @@ import Button from "@mui/material/Button";
 import YouTube from "react-youtube";
 import { IconButton, Typography } from "@mui/material";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import ImageCarousel from "../components/ImageCarousel.jsx";
 import YoutubeEmbed from "../components/YoutubeEmbed.jsx";
@@ -97,6 +98,8 @@ const RecipePage = () => {
                 <IconButton aria-label="add to favorites" onClick={backButton}>
                   <NavigateBeforeIcon
                     sx={{
+                      position: "fixed",
+                      top: "30%",
                       backgroundColor: "grey",
                       borderRadius: "50%",
                       width: 40,

@@ -43,12 +43,7 @@ function RecipeCards({ animal }) {
               "/" +
               animal.image[0]
             }
-            alt={
-              "http://localhost:5000/images/" +
-              animal.directoryname +
-              "/" +
-              animal.image[0]
-            }
+            alt={"Image"}
           />
           <CardContent
             sx={{ display: "flex", flexDirection: "column", marginTop: "-5%" }}

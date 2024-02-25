@@ -93,16 +93,28 @@ function ResponsiveAppBar(props) {
       paddingLeft: `calc(1em + ${theme.spacing(4)})`,
       transition: theme.transitions.create("width"),
       [theme.breakpoints.up("sm")]: {
-        width: "44ch",
+        width: "22ch",
         "&:focus": {
-          width: "60ch",
+          width: "40ch",
         },
       },
     },
   }));
 
   return (
-    <AppBar position="fixed">
+    <AppBar
+      position="fixed"
+      sx={{
+        height: { xs: "14%", sm: "12%", md: "10%", lg: "8%" },
+        backgroundColor: "#77dd77",
+        "&:hover": {
+          backgroundColor: "#8de5c1",
+          // "& button": {
+          //   color: "black",
+          // },
+        },
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
@@ -186,7 +198,15 @@ function ResponsiveAppBar(props) {
                 onClick={() => {
                   handleCloseNavMenu(page);
                 }}
-                sx={{ mx: 6, my: 2, color: "white", display: "block" }}
+                sx={{
+                  mx: 6,
+                  my: 2,
+                  color: "white",
+                  display: "block",
+                  "&:hover": {
+                    color: "black",
+                  },
+                }}
               >
                 {page}
               </Button>
