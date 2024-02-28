@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -19,10 +20,71 @@ import { unstable_useForkRef as useForkRef } from "@mui/utils";
 import ArrowDropUpRoundedIcon from "@mui/icons-material/ArrowDropUpRounded";
 import ArrowDropDownRoundedIcon from "@mui/icons-material/ArrowDropDownRounded";
 import UpDownButtons from "./UpDownButtons";
-import axios from "axios";
+import { ItemTypes } from "../ItemTypes";
+import { useDrag, useDrop } from "react-dnd";
 
-function InventoryCards({ elt, inventoryDict }) {
+function InventoryCards({ id, index, elt, inventoryDict, moveCard }) {
   const navigate = useNavigate();
+
+  const ref = useRef(null);
+  const [{ handlerId }, drop] = useDrop({
+    accept: ItemTypes.INVENTORYCARD,
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      };
+    },
+    hover(item, monitor) {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+      // Determine rectangle on screen
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+      // Get vertical middle
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+      // Get pixels to the top
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+      // Dragging downwards
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+      // Dragging upwards
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+      // Time to actually perform the action
+      moveCard(dragIndex, hoverIndex);
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      item.index = hoverIndex;
+    },
+  });
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemTypes.INVENTORYCARD,
+    item: () => {
+      return { id, index };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+  const opacity = isDragging ? 0 : 1;
+  drag(drop(ref));
+
   const Item = styled(Paper)(() => ({
     backgroundColor: "#98d6a9",
     padding: 2,
@@ -99,6 +161,8 @@ function InventoryCards({ elt, inventoryDict }) {
   return (
     <Card
       key={"card-" + elt}
+      ref={ref}
+      data-handler-id={handlerId}
       sx={{
         border: "1px solid #aaf0d1",
         marginBottom: "10px",
@@ -114,172 +178,177 @@ function InventoryCards({ elt, inventoryDict }) {
           {elt}
         </Typography>
         <Grid key={"GridContainer-" + elt} container spacing={1} marginTop="2%">
-          {inventoryDict[elt].map((item, index) => {
-            let dateToDisplay;
-            if (item.expiryDate) {
-              const dateTest = new Date(item.expiryDate);
-              const dateString = dateTest.toISOString();
+          {!inventoryDict ? (
+            <div>Loading</div>
+          ) : (
+            inventoryDict[elt].map((item, index) => {
+              let dateToDisplay;
+              if (item.expiryDate) {
+                const dateTest = new Date(item.expiryDate);
+                const dateString = dateTest.toISOString();
 
-              const inputDate = new Date(
-                Date.UTC(
-                  parseInt(dateString.substr(0, 4)), // Year
-                  parseInt(dateString.substr(5, 2)) - 1, // Month (0-indexed)
-                  parseInt(dateString.substr(8, 2)), // Day
-                  parseInt(dateString.substr(11, 2)), // Hours
-                  parseInt(dateString.substr(14, 2)), // Minutes
-                  parseInt(dateString.substr(17, 2)), // Seconds
-                  parseInt(dateString.substr(20, 3)) // Milliseconds
-                )
-              );
+                const inputDate = new Date(
+                  Date.UTC(
+                    parseInt(dateString.substr(0, 4)), // Year
+                    parseInt(dateString.substr(5, 2)) - 1, // Month (0-indexed)
+                    parseInt(dateString.substr(8, 2)), // Day
+                    parseInt(dateString.substr(11, 2)), // Hours
+                    parseInt(dateString.substr(14, 2)), // Minutes
+                    parseInt(dateString.substr(17, 2)), // Seconds
+                    parseInt(dateString.substr(20, 3)) // Milliseconds
+                  )
+                );
 
-              const options = {
-                day: "numeric",
-                month: "numeric",
-                year: "2-digit",
-              };
-              dateToDisplay = new Intl.DateTimeFormat("en-GB", options).format(
-                inputDate
-              );
-            }
+                const options = {
+                  day: "numeric",
+                  month: "numeric",
+                  year: "2-digit",
+                };
+                dateToDisplay = new Intl.DateTimeFormat(
+                  "en-GB",
+                  options
+                ).format(inputDate);
+              }
 
-            let newPercentage = item.availability;
+              let newPercentage = item.availability;
 
-            return (
-              <React.Fragment key={"unique-key-" + index}>
-                <Grid
-                  key={"GridItem-" + index}
-                  id={"GridItem-" + item._id}
-                  item
-                  xs={3}
-                >
-                  <Typography
-                    key={"TypographyItem-" + index}
-                    variant="h8"
-                    component="div"
-                    sx={{
-                      textAlign: "left",
-                      maxWidth: "100%",
-                    }}
+              return (
+                <React.Fragment key={"unique-key-" + index}>
+                  <Grid
+                    key={"GridItem-" + index}
+                    id={"GridItem-" + item._id}
+                    item
+                    xs={3}
                   >
-                    {item.item}
-                  </Typography>
-                </Grid>
-                <Grid
-                  key={"GridAmount-" + index}
-                  id={"GridAmount-" + item._id}
-                  item
-                  xs={1}
-                >
-                  <Typography
-                    key={"TypographyAmount-" + index}
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      textAlign: "left",
-                      maxWidth: "100%",
-                    }}
-                  >
-                    {" "}
-                    {item.amount ? item.amount + " " + item.unit : ""}
-                  </Typography>
-                </Grid>
-
-                <Grid
-                  key={"GridQuantity-" + index}
-                  id={"GridQuantity-" + item._id}
-                  item
-                  xs={1}
-                  sx={{
-                    alignContent: "flex-end",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <Typography
-                    key={"TypographyQuantity-" + index}
-                    id={"Typography-" + item._id}
-                    variant="body3"
-                    color="text.secondary"
-                    sx={{
-                      textAlign: "right",
-                      maxWidth: "100%",
-                    }}
-                  >
-                    {item.quantity}
-                  </Typography>
-                </Grid>
-                <Grid
-                  key={"GridPercentage-" + index}
-                  id={"GridPercentage-" + item._id}
-                  item
-                  xs={1}
-                  sx={{ marginTop: "-2%", marginLeft: "-5%" }}
-                >
-                  <UpDownButtons
-                    value={availablePercentage}
-                    onIncrease={() => increaseQuantity(item._id)}
-                    onDecrease={() => decreaseQuantity(item._id)}
-                  />
-                </Grid>
-                <Grid
-                  key={"GridDate-" + index}
-                  id={"GridDate-" + item._id}
-                  item
-                  xs={2}
-                >
-                  <Typography
-                    key={"TypographyDate-" + index}
-                    variant="body3"
-                    color="text.secondary"
-                    sx={{
-                      textAlign: "left",
-                      maxWidth: "100%",
-                    }}
-                  >
-                    {item.expiryDate ? "Exp: " + dateToDisplay : ""}
-                  </Typography>
-                </Grid>
-                <Grid
-                  key={"Slider-" + index}
-                  id={"Slider-" + item._id}
-                  item
-                  xs={2}
-                >
-                  <Box sx={{ width: 120 }}>
-                    <Slider
-                      aria-label="Temperature"
-                      defaultValue={newPercentage}
-                      getAriaValueText={valuetext}
-                      valueLabelDisplay="auto"
-                      shiftStep={30}
-                      step={10}
-                      marks
-                      min={0}
-                      max={100}
-                      onChange={(e) => {
-                        availablePercentage = e.target.value;
+                    <Typography
+                      key={"TypographyItem-" + index}
+                      variant="h8"
+                      component="div"
+                      sx={{
+                        textAlign: "left",
+                        maxWidth: "100%",
                       }}
-                      onMouseUp={() => savePercentage(item._id)}
-                    />
-                  </Box>
-                </Grid>
-
-                <Grid
-                  key={"GridButton-" + index}
-                  id={"GridButton-" + item._id}
-                  item
-                  xs={2}
-                >
-                  <IconButton
-                    aria-label="add to favorites"
-                    sx={{ bottom: "25%", marginLeft: "40%", padding: "1ch" }}
-                    onClick={() => deleteItem(item._id)}
+                    >
+                      {item.item}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    key={"GridAmount-" + index}
+                    id={"GridAmount-" + item._id}
+                    item
+                    xs={1}
                   >
-                    <DeleteTwoToneIcon />
-                  </IconButton>
-                </Grid>
-              </React.Fragment>
-            );
-          })}
+                    <Typography
+                      key={"TypographyAmount-" + index}
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        textAlign: "left",
+                        maxWidth: "100%",
+                      }}
+                    >
+                      {" "}
+                      {item.amount ? item.amount + " " + item.unit : ""}
+                    </Typography>
+                  </Grid>
+
+                  <Grid
+                    key={"GridQuantity-" + index}
+                    id={"GridQuantity-" + item._id}
+                    item
+                    xs={1}
+                    sx={{
+                      alignContent: "flex-end",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Typography
+                      key={"TypographyQuantity-" + index}
+                      id={"Typography-" + item._id}
+                      variant="body3"
+                      color="text.secondary"
+                      sx={{
+                        textAlign: "right",
+                        maxWidth: "100%",
+                      }}
+                    >
+                      {item.quantity}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    key={"GridPercentage-" + index}
+                    id={"GridPercentage-" + item._id}
+                    item
+                    xs={1}
+                    sx={{ marginTop: "-2%", marginLeft: "-5%" }}
+                  >
+                    <UpDownButtons
+                      value={availablePercentage}
+                      onIncrease={() => increaseQuantity(item._id)}
+                      onDecrease={() => decreaseQuantity(item._id)}
+                    />
+                  </Grid>
+                  <Grid
+                    key={"GridDate-" + index}
+                    id={"GridDate-" + item._id}
+                    item
+                    xs={2}
+                  >
+                    <Typography
+                      key={"TypographyDate-" + index}
+                      variant="body3"
+                      color="text.secondary"
+                      sx={{
+                        textAlign: "left",
+                        maxWidth: "100%",
+                      }}
+                    >
+                      {item.expiryDate ? "Exp: " + dateToDisplay : ""}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    key={"Slider-" + index}
+                    id={"Slider-" + item._id}
+                    item
+                    xs={2}
+                  >
+                    <Box sx={{ width: 120 }}>
+                      <Slider
+                        aria-label="Temperature"
+                        defaultValue={newPercentage}
+                        getAriaValueText={valuetext}
+                        valueLabelDisplay="auto"
+                        shiftStep={30}
+                        step={10}
+                        marks
+                        min={0}
+                        max={100}
+                        onChange={(e) => {
+                          availablePercentage = e.target.value;
+                        }}
+                        onMouseUp={() => savePercentage(item._id)}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid
+                    key={"GridButton-" + index}
+                    id={"GridButton-" + item._id}
+                    item
+                    xs={2}
+                  >
+                    <IconButton
+                      aria-label="add to favorites"
+                      sx={{ bottom: "25%", marginLeft: "40%", padding: "1ch" }}
+                      onClick={() => deleteItem(item._id)}
+                    >
+                      <DeleteTwoToneIcon />
+                    </IconButton>
+                  </Grid>
+                </React.Fragment>
+              );
+            })
+          )}
         </Grid>
       </CardContent>
     </Card>

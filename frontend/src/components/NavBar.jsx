@@ -46,6 +46,18 @@ function ResponsiveAppBar(props) {
     }
   };
 
+  const handleOpenPage = (page) => {
+    setAnchorElNav(null);
+    console.log(page);
+    switch (page) {
+      case "Shopping List":
+        navigate("/grocery");
+        break;
+      default:
+        navigate("/" + page);
+    }
+  };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -166,9 +178,18 @@ function ResponsiveAppBar(props) {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={() => handleOpenPage(page)}
+                  color="inherit"
+                >
+                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">{page}</Typography>
+                  </MenuItem>
+                </IconButton>
               ))}
             </Menu>
           </Box>

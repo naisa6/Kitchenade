@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import NavBar from "../components/NavBar.jsx";
 import InventorySideBar from "../components/InventorySideBar.jsx";
 import InventoryCards from "../components/InventoryCards.jsx";
@@ -11,13 +11,17 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 
 const Inventory = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [inventoryDict, setInventoryDict] = useState([]);
   const [inventorySection, setInventorySection] = useState([]);
   const [user, setUser] = useState("65d8843652572f9bda40ab76");
+  const [forceRender, setForceRender] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
+    setForceRender((prev) => !prev);
+  }, [inventorySection]);
+
+  useEffect(() => {
     let tempDict = {};
     axios
       .get(`http://localhost:5000/users/${user}`)
@@ -46,6 +50,63 @@ const Inventory = () => {
       })
       .catch((error) => console.log("ERROR section:", error));
   }, []);
+
+  useEffect(() => {
+    console.log(inventoryDict);
+    console.log(inventorySection);
+    console.log("changed");
+  }, [inventoryDict]);
+
+  const moveCard = useCallback(
+    (dragIndex, hoverIndex) => {
+      // Check if inventorySection[dragIndex] is defined
+      if (inventorySection[dragIndex] === undefined) {
+        console.log("ITEM undefined");
+        return;
+      }
+
+      const listItem = inventorySection[dragIndex];
+      const newInventorySection = [...inventorySection];
+      newInventorySection.splice(dragIndex, 1); // Remove the dragged item
+      newInventorySection.splice(hoverIndex, 0, listItem); // Insert the item at the new position
+
+      setInventorySection(newInventorySection);
+    },
+    [inventorySection]
+  );
+  useEffect(() => {
+    console.log("change");
+  }, [inventorySection]);
+
+  const renderCard = useCallback(
+    (elt, index) => {
+      console.log("ITERATE", elt, index, inventoryDict);
+
+      if (!inventoryDict || Object.keys(inventoryDict).length === 0) {
+        console.log("No data or data is still loading");
+        return <div>Loading or No data</div>;
+      }
+
+      return (
+        <InventoryCards
+          elt={elt}
+          id={elt + index}
+          index={index}
+          inventoryDict={inventoryDict}
+          key={index}
+          moveCard={moveCard}
+          sx={{
+            border: "1px solid #aaf0d1",
+            marginBottom: "10px",
+            "&:hover": {
+              cursor: "move",
+            },
+          }}
+        />
+      );
+    },
+    [inventorySection, inventoryDict, forceRender]
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -94,17 +155,13 @@ const Inventory = () => {
             marginTop: { xs: "25%", sm: "15%", md: "9%", lg: "7%" },
           }}
         >
-          {inventorySection.map((elt, index) => (
-            <InventoryCards
-              elt={elt}
-              inventoryDict={inventoryDict}
-              key={index}
-              sx={{
-                border: "1px solid #aaf0d1",
-                marginBottom: "10px",
-              }}
-            ></InventoryCards>
-          ))}
+          {loading ? (
+            <div>Loading</div>
+          ) : (
+            <div style={{ cursor: "grab" }}>
+              {inventorySection.map((elt, index) => renderCard(elt, index))}
+            </div>
+          )}
         </Box>
       )}
     </Box>
